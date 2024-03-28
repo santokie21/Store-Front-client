@@ -15,7 +15,6 @@ export class ProductsService {
     return this.apiService.get(url, {
       params,
       responseType: 'json',
-
     });
   }
 }
