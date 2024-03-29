@@ -20,17 +20,30 @@ export class HomeComponent {
 
   products: Product[] = [];
 
-  baseUrl = 'http://localhost:3000/api/clothes';
+  totalRecords: number = 0;
+  rows: number = 5;
 
-  ngOnInit(): void {
-    this.productsService
-      .getProducts(this.baseUrl, { page: 1, perPage: 5 })
-      .subscribe((products: Products) => {
-        this.products = products.items;
-      });
-  }
+  baseUrl = 'http://localhost:3000/api/clothes';
 
   onProductOutput(product: Product): void {
     console.log(product, "output");
   }
+
+  onPageChange(event: any): void {
+    this.fetchProducts(event.page + 1, event.rows);
+  }
+
+  fetchProducts(page: number, perPage: number): void {
+    this.productsService
+      .getProducts(this.baseUrl, { page, perPage })
+      .subscribe((products: Products) => {
+        this.products = products.items;
+        this.totalRecords = products.total;
+      });
+  }
+
+  ngOnInit(): void {
+    this.fetchProducts(1, this.rows);
+  }
+
 }
