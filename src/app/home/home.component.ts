@@ -36,9 +36,14 @@ export class HomeComponent {
   fetchProducts(page: number, perPage: number): void {
     this.productsService
       .getProducts(this.baseUrl, { page, perPage })
-      .subscribe((products: Products) => {
-        this.products = products.items;
-        this.totalRecords = products.total;
+      .subscribe({
+        next: (data: Products) => {
+          this.products = data.items;
+          this.totalRecords = data.total;
+        },
+        error: (error) => {
+          console.error(error);
+        },
       });
   }
 
@@ -46,4 +51,40 @@ export class HomeComponent {
     this.fetchProducts(1, this.rows);
   }
 
+  addProduct(product: Product): void {
+    this.productsService.addProduct(this.baseUrl, product).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.fetchProducts(1, this.rows);
+      },
+      error: (error) => {
+        console.error(error)
+      }
+    });
+  }
+
+  deleteProduct(product: Product, id: string): void {
+    this.productsService.deleteProduct(`${this.baseUrl}/${id}`).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.fetchProducts(1, this.rows);
+      },
+      error: (error) => {
+        console.error(error)
+      }
+    });
+  }
+
+  updateProduct(product: Product, id: string): void {
+    this.productsService.updateProduct(`${this.baseUrl}/${id}`, product).subscribe(
+      {
+        next: (data) => {
+          console.log(data);
+          this.fetchProducts(1, this.rows);
+        },
+        error: (error) => {
+          console.error(error)
+        }
+      });
+  }
 }
