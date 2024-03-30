@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
 import { Product, Products } from '../../types';
+import { EditPopupComponent } from '../components/edit-popup/edit-popup.component';
 import { ProductComponent } from '../components/product/product.component';
 import { ProductsService } from '../services/products.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ProductComponent, CommonModule, PaginatorModule],
+  imports: [ProductComponent, CommonModule, PaginatorModule, EditPopupComponent, ButtonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 
@@ -22,6 +24,46 @@ export class HomeComponent {
 
   totalRecords: number = 0;
   rows: number = 5;
+
+  displayEditPopup: boolean = false;
+  displayAddPopup: boolean = false;
+
+  toggleEditPopup(product: Product): void {
+    this.selectedProduct = product;
+    this.displayEditPopup = true;
+  }
+
+  toggleAddPopup(): void {
+    this.displayAddPopup = true;
+  }
+
+  toggleDeletePopup(product: Product): void {
+    if (!product._id) {
+      return;
+    }
+    this.deleteProduct(product._id);
+  }
+
+  selectedProduct: Product = {
+    _id: '',
+    name: '',
+    image: '',
+    price: '',
+    rating: 0
+  }
+
+  onConfirmAdd(product: Product): void {
+    this.addProduct(product);
+    this.displayAddPopup = false;
+  }
+
+  onConfirmEdit(product: Product): void {
+    if (!this.selectedProduct._id) {
+      return;
+    }
+    this.updateProduct(product, this.selectedProduct._id);
+    this.displayEditPopup = false;
+  }
 
   baseUrl = 'http://localhost:3000/api/clothes';
 
@@ -63,7 +105,7 @@ export class HomeComponent {
     });
   }
 
-  deleteProduct(product: Product, id: string): void {
+  deleteProduct(id: string): void {
     this.productsService.deleteProduct(`${this.baseUrl}/${id}`).subscribe({
       next: (data) => {
         console.log(data);
